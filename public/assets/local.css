@@ -395,3 +395,21 @@ body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-f57eb76475aa94c8c98a .p
     justify-content: center;
   }
 }
+
+/* Tablet / intermediate widths: the display title was frozen at its
+   desktop size (215px) by the old Squarespace JS, so it overflowed and
+   overlapped the date between 768px and ~1800px. Make it fluid. */
+@media (min-width: 768px) {
+  .sqsrte-scaled-text {
+    font-size: clamp(88px, 11.8vw, 215px) !important;
+    max-width: 100% !important;
+  }
+
+  /* Keep the hero title block inside its grid column on tablets. */
+  .fe-block-02dfdd966000e5cc6d9a h1,
+  .fe-block-02dfdd966000e5cc6d9a .sqsrte-scaled-text {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+}
