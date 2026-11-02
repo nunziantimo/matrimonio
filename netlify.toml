@@ -2,13 +2,6 @@
   publish = "public"
   command = ""
 
-# URL pulita come sul server locale: /regalo -> /regalo.html
-[[redirects]]
-  from = "/regalo"
-  to = "/regalo.html"
-  status = 200
-
-# Asset con hash nel nome: cache lunga
 [[headers]]
   for = "/assets/*"
   [headers.values]
@@ -26,6 +19,6 @@
     Cache-Control = "no-cache"
 
 [[headers]]
-  for = "/regalo.html"
+  for = "/regalo/index.html"
   [headers.values]
     Cache-Control = "no-cache"

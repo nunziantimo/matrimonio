@@ -90,13 +90,26 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  // Pretty URLs: /regalo -> /regalo.html
+  // Legacy URL: /regalo.html -> /regalo/
+  if (pathname === "/regalo.html") {
+    res.writeHead(301, { Location: "/regalo/" });
+    res.end();
+    return;
+  }
+
+  // Pretty URLs: /regalo -> regalo/index.html (with trailing slash redirect,
+  // so relative asset paths resolve correctly at any sub-path)
   fs.stat(candidate, (error, stats) => {
     if (!error && stats.isFile()) {
       sendFile(req, res, candidate);
       return;
     }
     if (!error && stats.isDirectory()) {
+      if (!pathname.endsWith("/")) {
+        res.writeHead(301, { Location: pathname + "/" });
+        res.end();
+        return;
+      }
       sendFile(req, res, path.join(candidate, "index.html"));
       return;
     }
