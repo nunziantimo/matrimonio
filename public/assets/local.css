@@ -1,0 +1,397 @@
+/* Local overrides for the static clone. */
+
+/* Remove Squarespace's "fonts-loading" flash-hide: without the Typekit
+   loader the html keeps `wf-loading`, which makes all text transparent
+   for 3 seconds. */
+html.wf-loading * {
+  animation: none !important;
+}
+
+/* Background image + parallax */
+html,
+body,
+#siteWrapper,
+main,
+footer {
+  background-color: #7a494e !important;
+}
+
+.background-image-fx,
+.section-background img {
+  visibility: visible !important;
+}
+
+.section-background,
+.section-background-content {
+  overflow: hidden;
+}
+
+.section-background img.background-image-fx {
+  will-change: transform;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+[data-section-id="6ae3d3b0e81d677d1d477d7f"] img.background-image-fx {
+  object-position: 88% 5% !important;
+  transform-origin: 88% 18% !important;
+}
+
+@media (max-width: 767px) {
+  [data-section-id="6ae3d3b0e81d677d1d477d7f"] img.background-image-fx {
+    transform-origin: 88% 10% !important;
+  }
+}
+
+.section-background-canvas,
+.background-fx-canvas {
+  display: none !important;
+}
+
+/* Scroll reveal */
+.preFade {
+  opacity: 0;
+  transform: translateY(16px);
+  transition-property: opacity, transform !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+  transition-delay: 0s !important;
+  transition-duration: 0.6s !important;
+}
+
+.fadeIn {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* Header elements and nested .preFade wrappers should not shift vertically */
+header .preFade,
+header .fadeIn,
+.preFade .preFade,
+.preFade .fadeIn {
+  transform: none !important;
+}
+
+/* Subtle stagger for homepage scroll sections */
+.fe-block-c3b28fa2433b2bc03a73 p.preFade:nth-of-type(2) {
+  transition-delay: 0.18s !important;
+}
+
+.fe-block-cdb8fcfd328a19b74483 h3.preFade {
+  transition-delay: 0.15s !important;
+}
+
+.fe-block-cdb8fcfd328a19b74483 p.preFade:nth-of-type(1) {
+  transition-delay: 0.3s !important;
+}
+
+.fe-block-cdb8fcfd328a19b74483 p.preFade:nth-of-type(2) {
+  transition-delay: 0.45s !important;
+}
+
+.fe-block-196a8a685450204bc529 .preFade {
+  transition-delay: 0.2s !important;
+}
+
+/* Dividers: match the original pink 1px rule */
+.horizontalrule-block hr,
+.sqs-block-horizontalrule hr {
+  border: none !important;
+  height: 1px !important;
+  background-color: #e9aabc !important;
+  width: 100% !important;
+  max-width: 1760px !important;
+  margin: 2.5rem auto !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+
+/* Lista nozze: replace the wavy section divider with a crisp 1px
+   beige border identical to .header-border, on a uniform background. */
+.has-section-divider[data-section-id="6ae3d3b0e81d677d1d477d7f"] .section-border {
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  border-bottom: 1px solid #e5cfb7 !important;
+  box-sizing: border-box !important;
+}
+
+.has-section-divider[data-section-id="6ae3d3b0e81d677d1d477d7f"] .section-divider-display {
+  display: none !important;
+}
+
+.has-section-divider[data-section-id="6ae3d3b0e81d677d1d477d7f"]::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Marquee full width on desktop and mobile */
+.fe-block-8086998609d94a254383,
+.fe-block-744d5fde7d2f3e2bc6a7 {
+  grid-column: 1 / 27 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.fe-block-8086998609d94a254383 .sqs-block,
+.fe-block-744d5fde7d2f3e2bc6a7 .sqs-block,
+.fe-block-8086998609d94a254383 .sqs-block-content,
+.fe-block-744d5fde7d2f3e2bc6a7 .sqs-block-content,
+.sqs-block-marquee .Marquee,
+.sqs-block-marquee .Marquee-svg {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+footer section.page-section[data-section-id="6ae3d3b0e81d677d1d477d2f"] {
+  --previous-section-divider-offset: 0px !important;
+}
+
+/* Hide Squarespace chrome */
+.sqs-cookie-banner-v2,
+#cookie-banner,
+.sqs-announcement-bar-dropzone,
+.sqs-custom-cart {
+  display: none !important;
+}
+
+/* Mobile menu */
+body.menu-open {
+  overflow: hidden;
+}
+
+body.menu-open .header-menu {
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 999 !important;
+}
+
+body.menu-open header {
+  z-index: 1000;
+}
+
+.local-menu-close {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 1001;
+  width: 44px;
+  height: 44px;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: #6d343f;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  display: none;
+}
+
+body.menu-open .local-menu-close {
+  display: block;
+}
+
+/* Mobile menu: burgundy text over the pink overlay for contrast */
+.header-menu,
+.header-menu .header-menu-nav-item,
+.header-menu .header-menu-nav-item a,
+.header-menu .header-menu-nav-item-content,
+.header-menu .header-nav-item a {
+  color: #6d343f !important;
+  -webkit-text-fill-color: #6d343f !important;
+}
+
+.header-menu .header-menu-nav-item a:hover,
+.header-menu .header-menu-nav-item a:active,
+.header-menu .header-menu-nav-item-content:hover {
+  color: #3d1b22 !important;
+  -webkit-text-fill-color: #3d1b22 !important;
+}
+
+/* Copy IBAN feedback */
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 2000;
+  padding: 12px 20px;
+  background: #e5cfb7 !important;
+  color: #6d343f !important;
+  -webkit-text-fill-color: #6d343f !important;
+  font-family: Montserrat, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  box-shadow: 0 6px 18px rgba(109, 52, 63, 0.25);
+}
+
+.copy-toast.is-visible {
+  opacity: 1;
+}
+
+/* IBAN button: keep the original pink outline, only refine the type */
+a.sqs-block-button-element[href=""],
+a.sqs-button-element--primary[href=""] {
+  font-family: Montserrat, "Helvetica Neue", Arial, sans-serif !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1.2;
+  cursor: pointer;
+  color: #e9aabc !important;
+  -webkit-text-fill-color: #e9aabc !important;
+  border-color: #e9aabc !important;
+  background-color: transparent;
+  box-shadow: 0 0 0 rgba(109, 52, 63, 0);
+  transition: color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    -webkit-text-fill-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
+}
+
+a.sqs-block-button-element[href=""]:hover,
+a.sqs-button-element--primary[href=""]:hover,
+a.sqs-block-button-element[href=""]:focus-visible,
+a.sqs-button-element--primary[href=""]:focus-visible {
+  color: #6d343f !important;
+  -webkit-text-fill-color: #6d343f !important;
+  border-color: #e5cfb7 !important;
+  background-color: #e5cfb7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(109, 52, 63, 0.22);
+}
+
+a.sqs-block-button-element[href=""]:active,
+a.sqs-button-element--primary[href=""]:active {
+  color: #6d343f !important;
+  -webkit-text-fill-color: #6d343f !important;
+  border-color: #e5cfb7 !important;
+  background-color: #e5cfb7;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(109, 52, 63, 0.18);
+}
+
+a.sqs-block-button-element[href=""]:hover *,
+a.sqs-button-element--primary[href=""]:hover *,
+a.sqs-block-button-element[href=""]:focus-visible *,
+a.sqs-button-element--primary[href=""]:focus-visible *,
+a.sqs-block-button-element[href=""]:active *,
+a.sqs-button-element--primary[href=""]:active * {
+  color: #6d343f !important;
+  -webkit-text-fill-color: #6d343f !important;
+}
+
+a.sqs-block-button-element[href=""] *,
+a.sqs-button-element--primary[href=""] * {
+  font-family: inherit !important;
+  font-weight: inherit !important;
+  letter-spacing: inherit !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.sqs-block-button-element[href=""],
+  a.sqs-button-element--primary[href=""],
+  a.sqs-block-button-element[href=""]:hover,
+  a.sqs-button-element--primary[href=""]:hover {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Staggered entrance animations for Homepage Hero & Lista Nozze.
+   Declared in CSS so they apply before the first paint: no flash of the
+   full content before the cascade starts. */
+@keyframes regaloReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Homepage landing hero: the whole hero content fades in together
+   (single unit, no left-to-right sequence). */
+body.homepage main section[data-section-id="6ae3d3b0e81d677d1d477db6"] .content-wrapper {
+  animation: regaloReveal 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+}
+
+/* Lista nozze cascade: text -> IBAN button -> "Intestato a" */
+body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-64a95292975c77b252c8 {
+  animation: regaloReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+}
+
+body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-660be2cad256b712cd7f {
+  animation: regaloReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.5s backwards;
+}
+
+body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-f57eb76475aa94c8c98a {
+  animation: regaloReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.9s backwards;
+}
+
+/* Keep inner .preFade elements inside cascade-animated blocks neutral so
+   they don't double-fade or compound transforms. */
+body.homepage main section[data-section-id="6ae3d3b0e81d677d1d477db6"] .preFade,
+body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-64a95292975c77b252c8 .preFade,
+body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-660be2cad256b712cd7f .preFade,
+body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-f57eb76475aa94c8c98a .preFade {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.homepage main section[data-section-id="6ae3d3b0e81d677d1d477db6"] .content-wrapper,
+  body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-64a95292975c77b252c8,
+  body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-660be2cad256b712cd7f,
+  body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-f57eb76475aa94c8c98a {
+    animation: none !important;
+  }
+  .preFade {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Mobile-first adjustments */
+@media (max-width: 767px) {
+  /* Marquee full width: span the whole fluid-engine grid. */
+  .fe-block-8086998609d94a254383,
+  .fe-block-744d5fde7d2f3e2bc6a7 {
+    grid-column: 1 / 13 !important;
+  }
+
+  /* The big display title is pre-scaled for desktop in the captured HTML. */
+  .sqsrte-scaled-text {
+    font-size: 18vw !important;
+  }
+
+  /* Center the hero title block and let it use the full width. */
+  .fe-block-02dfdd966000e5cc6d9a {
+    grid-area: 4 / 1 / 13 / 13 !important;
+  }
+  .fe-block-02dfdd966000e5cc6d9a .sqs-block,
+  .fe-block-02dfdd966000e5cc6d9a .sqs-block-alignment-wrapper {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+  .fe-block-02dfdd966000e5cc6d9a h1 {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+
+  /* Keep the IBAN button tappable and easy to copy. */
+  .sqs-block-button-element {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
