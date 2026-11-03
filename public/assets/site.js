@@ -198,7 +198,10 @@
           var tspan = tspans[i];
           var x = parseFloat(tspan.getAttribute("x"));
           if (isNaN(x)) {
-            tspan.style.display = "none";
+            if (tspan._mdisplay !== "none") {
+              tspan._mdisplay = "none";
+              tspan.style.display = "none";
+            }
             continue;
           }
           var item = items[i % items.length];
@@ -208,7 +211,12 @@
           var max = pathLength;
           var offscreen =
             (start > max && end > max) || (start < min && end < min);
-          tspan.style.display = offscreen ? "none" : "block";
+          var nextDisplay = offscreen ? "none" : "block";
+          // Write only on change: avoids a style recalculation every frame.
+          if (tspan._mdisplay !== nextDisplay) {
+            tspan._mdisplay = nextDisplay;
+            tspan.style.display = nextDisplay;
+          }
         }
       }
 
@@ -377,17 +385,33 @@
         var byBleed = (sectionRect.height || 1) * entry.bleed;
 
         entry.maxOffset = Math.max(0, Math.min(byBleed, safe * 0.85));
+        entry.docTop = sectionRect.top + (window.pageYOffset || 0);
+        entry.lastOffset = null;
       });
     }
 
+    var lastScrollY = -1;
+
     function update() {
+      // Read the scroll position once, without touching layout.
+      var scrollY =
+        window.pageYOffset ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+
+      if (scrollY === lastScrollY) return;
+      lastScrollY = scrollY;
+
       entries.forEach(function (entry) {
-        var rect = entry.section.getBoundingClientRect();
-        var maxOffset = entry.maxOffset;
-        var scrolled = Math.max(-rect.top, 0);
-        var offset = -maxOffset + scrolled * entry.speed;
-        if (offset > maxOffset) offset = maxOffset;
-        if (offset < -maxOffset) offset = -maxOffset;
+        var scrolled = Math.max(scrollY - entry.docTop, 0);
+        var offset = -entry.maxOffset + scrolled * entry.speed;
+        if (offset > entry.maxOffset) offset = entry.maxOffset;
+        if (offset < -entry.maxOffset) offset = -entry.maxOffset;
+
+        // Avoid redundant style writes (prevents repaint work each frame).
+        if (entry.lastOffset === offset) return;
+        entry.lastOffset = offset;
 
         entry.img.style.transform =
           "translate3d(0, " +
@@ -398,20 +422,27 @@
       });
     }
 
+    // A single rAF loop keeps the background in sync even during iOS
+    // momentum scrolling, where scroll events are throttled/paused.
+    function loop() {
+      update();
+      window.requestAnimationFrame(loop);
+    }
+
     function refresh() {
       measure();
+      lastScrollY = -1;
       update();
     }
 
-    window.addEventListener("scroll", update, { passive: true });
-    document.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("touchmove", update, { passive: true });
     window.addEventListener("resize", refresh);
     window.addEventListener("load", refresh);
+    window.addEventListener("orientationchange", refresh);
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(refresh);
     }
     refresh();
+    window.requestAnimationFrame(loop);
   }
 
   // Homepage hero & Lista nozze: the entrance animation runs in CSS (local.css).
