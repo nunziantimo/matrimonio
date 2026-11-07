@@ -413,3 +413,49 @@ body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-f57eb76475aa94c8c98a .p
     text-align: center !important;
   }
 }
+
+
+/* ==========================================================================
+   Spacing fix — "Il grande giorno" → "Sposa / Sposo" (2026-11)
+   The "Il grande giorno" section (#6ae3d3b0e81d677d1d477dc6) uses
+   section-height--medium, i.e. min-height: 66vh plus 6.6vmax vertical
+   padding (site.css). With vertical-alignment--middle that centered the
+   content inside a very tall box and left a large void under "Ricevimento".
+   The new "Sposa / Sposo" section (#6ae3d3b0e81d677d1d477dd1) added
+   section-height--small (min-height: 33vh) on top of that. Drop both forced
+   heights and tune the padding so the pink horizontal rule between them has
+   roughly equal space above and below (~120px at 1440px wide, ~115px on
+   mobile), matching the separator before "Il grande giorno".
+   ========================================================================== */
+
+/* Il grande giorno: no forced 66vh height; tighter bottom padding. */
+[data-section-id="6ae3d3b0e81d677d1d477dc6"] {
+  min-height: 0 !important;
+}
+
+[data-section-id="6ae3d3b0e81d677d1d477dc6"] > .content-wrapper {
+  padding-bottom: 2.2vmax !important;
+}
+
+/* Sposa / Sposo: no forced 33vh height; 2.2vmax top gap on desktop. */
+[data-section-id="6ae3d3b0e81d677d1d477dd1"] {
+  min-height: 0 !important;
+}
+
+[data-section-id="6ae3d3b0e81d677d1d477dd1"] > .content-wrapper {
+  padding-top: 2.2vmax !important;
+  padding-bottom: 3.3vmax !important;
+}
+
+/* Mobile: rebalance around the separator line (the fluid grid leaves
+   extra space under "Ricevimento", compensated below the line). */
+@media (max-width: 767px) {
+  [data-section-id="6ae3d3b0e81d677d1d477dc6"] > .content-wrapper {
+    padding-bottom: 0.8vmax !important;
+  }
+
+  [data-section-id="6ae3d3b0e81d677d1d477dd1"] > .content-wrapper {
+    padding-top: 6vmax !important;
+    padding-bottom: 1.65vmax !important;
+  }
+}
