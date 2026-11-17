@@ -392,7 +392,39 @@
 
     var lastScrollY = -1;
 
+    // On touch devices the page is scrolled by the compositor thread, so a
+    // JS-driven transform always lags one frame behind and looks jerky.
+    // Where supported, hand the parallax to a scroll-driven CSS animation
+    // (runs on the compositor, perfectly in sync with the finger).
+    var isTouch =
+      (window.matchMedia &&
+        window.matchMedia("(hover: none) and (pointer: coarse)").matches) ||
+      window.innerWidth <= 767;
+    var useCss =
+      isTouch &&
+      window.CSS &&
+      CSS.supports &&
+      CSS.supports("animation-timeline: scroll()") &&
+      CSS.supports("animation-range: 0px 100px");
+
+    function applyCss() {
+      entries.forEach(function (entry) {
+        var img = entry.img;
+        var travel = (2 * entry.maxOffset) / entry.speed;
+        img.style.transform = "";
+        img.style.setProperty("--px-max", entry.maxOffset.toFixed(2) + "px");
+        img.style.setProperty("--px-scale", entry.scale.toFixed(4));
+        img.style.setProperty("--px-start", Math.round(entry.docTop) + "px");
+        img.style.setProperty(
+          "--px-end",
+          Math.round(entry.docTop + Math.max(travel, 1)) + "px"
+        );
+        img.classList.add("px-css");
+      });
+    }
+
     function update() {
+      if (useCss) return;
       // Read the scroll position once, without touching layout.
       var scrollY =
         window.pageYOffset ||
@@ -430,19 +462,37 @@
     }
 
     function refresh() {
+      if (useCss) {
+        // measure() needs the plain JS transform, so pause the CSS animation.
+        entries.forEach(function (entry) {
+          entry.img.classList.remove("px-css");
+        });
+      }
       measure();
       lastScrollY = -1;
-      update();
+      if (useCss) {
+        applyCss();
+      } else {
+        update();
+      }
     }
 
-    window.addEventListener("resize", refresh);
+    // Mobile browsers fire "resize" whenever the address bar shows/hides
+    // during scroll: re-measuring then makes the background jump. Only
+    // re-measure when the width actually changes.
+    var lastWidth = window.innerWidth;
+    window.addEventListener("resize", function () {
+      if (isTouch && window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
+      refresh();
+    });
     window.addEventListener("load", refresh);
     window.addEventListener("orientationchange", refresh);
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(refresh);
     }
     refresh();
-    window.requestAnimationFrame(loop);
+    if (!useCss) window.requestAnimationFrame(loop);
   }
 
   // Homepage hero & Lista nozze: the entrance animation runs in CSS (local.css).

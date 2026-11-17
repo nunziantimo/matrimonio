@@ -459,3 +459,22 @@ body[id="collection-6ae3d3b0e81d677d1d477d7b"] .fe-block-f57eb76475aa94c8c98a .p
     padding-bottom: 1.65vmax !important;
   }
 }
+
+/* Mobile parallax: scroll-driven animation (runs on the compositor, no
+   jank). Variables are set per image by site.js (setupParallax). */
+@keyframes pxScroll {
+  from {
+    transform: translate3d(0, calc(-1 * var(--px-max, 0px)), 0) scale(var(--px-scale, 1));
+  }
+  to {
+    transform: translate3d(0, var(--px-max, 0px), 0) scale(var(--px-scale, 1));
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .section-background img.background-image-fx.px-css {
+    animation: pxScroll linear both;
+    animation-timeline: scroll(root block);
+    animation-range: var(--px-start, 0px) var(--px-end, 100px);
+  }
+}
