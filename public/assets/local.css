@@ -74,7 +74,7 @@ header .fadeIn,
 
 /* Subtle stagger for homepage scroll sections */
 .fe-block-c3b28fa2433b2bc03a73 p.preFade:nth-of-type(2) {
-  transition-delay: 0.18s !important;
+  transition-delay: 0.25s !important;
 }
 
 .fe-block-cdb8fcfd328a19b74483 h3.preFade {
@@ -91,6 +91,39 @@ header .fadeIn,
 
 .fe-block-196a8a685450204bc529 .preFade {
   transition-delay: 0.2s !important;
+}
+
+/* Sposa / Sposo: mirror the "Il grande giorno" cascade (h3 first, then the
+   paragraph, always 0.15s apart). Sposo trails Sposa by 0.1s so the two
+   blocks read as one soft top-down wave when they enter together. */
+.fe-block-a1b2c3d4e5f6a7b8c9d0 h3.preFade {
+  transition-delay: 0.15s !important;
+}
+
+.fe-block-a1b2c3d4e5f6a7b8c9d0 p.preFade:nth-of-type(1) {
+  transition-delay: 0.3s !important;
+}
+
+.fe-block-b2c3d4e5f6a7b8c9d0e1 h3.preFade {
+  transition-delay: 0.25s !important;
+}
+
+.fe-block-b2c3d4e5f6a7b8c9d0e1 p.preFade:nth-of-type(1) {
+  transition-delay: 0.4s !important;
+}
+
+/* "Festeggia con noi": slower and softer reveal, scoped to this block only.
+   Wrapped in prefers-reduced-motion: no-preference so the reduced-motion
+   block further down keeps full control (no motion at all when requested). */
+@media (prefers-reduced-motion: no-preference) {
+  .fe-block-c3b28fa2433b2bc03a73 .preFade {
+    transform: translateY(12px);
+    transition-duration: 1.1s !important;
+  }
+
+  .fe-block-c3b28fa2433b2bc03a73 .preFade:not(.fadeIn) {
+    will-change: opacity, transform;
+  }
 }
 
 /* Dividers: match the original pink 1px rule */

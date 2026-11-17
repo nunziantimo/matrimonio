@@ -323,8 +323,17 @@
     window.setTimeout(revealInView, 400);
 
     // Last-resort safety net: never leave content permanently hidden.
+    // It only force-reveals elements that are already in (or above) the
+    // viewport: anything still below the fold stays hidden and keeps its
+    // scroll-in animation instead of being silently pre-revealed after 8s.
     window.setTimeout(function () {
-      targets.forEach(reveal);
+      var viewportHeight =
+        window.innerHeight || document.documentElement.clientHeight;
+      targets.forEach(function (element) {
+        if (element.classList.contains("fadeIn")) return;
+        var rect = element.getBoundingClientRect();
+        if (rect.top < viewportHeight) reveal(element);
+      });
     }, 8000);
   }
 
