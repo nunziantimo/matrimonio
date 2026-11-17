@@ -293,19 +293,32 @@
 
     // Fallback: reveal anything that enters the viewport, even if the
     // IntersectionObserver does not fire (older mobile browsers).
-    function revealInView() {
+    // Throttled to one check per frame and detached once everything is
+    // visible, so it never adds layout work while scrolling.
+    var revealPending = false;
+    function checkInView() {
+      revealPending = false;
       var viewportHeight =
         window.innerHeight || document.documentElement.clientHeight;
+      var remaining = 0;
       targets.forEach(function (element) {
         if (element.classList.contains("fadeIn")) return;
         var rect = element.getBoundingClientRect();
         if (rect.bottom > 0 && rect.top < viewportHeight) reveal(element);
+        else remaining++;
       });
+      if (!remaining) {
+        window.removeEventListener("scroll", revealInView);
+        window.removeEventListener("resize", revealInView);
+      }
+    }
+    function revealInView() {
+      if (revealPending) return;
+      revealPending = true;
+      window.requestAnimationFrame(checkInView);
     }
 
     window.addEventListener("scroll", revealInView, { passive: true });
-    document.addEventListener("scroll", revealInView, { passive: true });
-    window.addEventListener("touchmove", revealInView, { passive: true });
     window.addEventListener("resize", revealInView);
     window.setTimeout(revealInView, 400);
 
@@ -407,11 +420,42 @@
       CSS.supports("animation-timeline: scroll()") &&
       CSS.supports("animation-range: 0px 100px");
 
+    var hasScrollTimeline = typeof window.ScrollTimeline === "function";
+
     function applyCss() {
       entries.forEach(function (entry) {
         var img = entry.img;
         var travel = (2 * entry.maxOffset) / entry.speed;
         img.style.transform = "";
+
+        // Preferred: Web Animation with concrete keyframes (no CSS vars),
+        // which the browser can run entirely on the compositor thread.
+        if (hasScrollTimeline) {
+          try {
+            if (entry.anim) entry.anim.cancel();
+            var scale = entry.scale.toFixed(4);
+            var max = entry.maxOffset.toFixed(2);
+            entry.anim = img.animate(
+              [
+                { transform: "translate3d(0, -" + max + "px, 0) scale(" + scale + ")" },
+                { transform: "translate3d(0, " + max + "px, 0) scale(" + scale + ")" }
+              ],
+              {
+                fill: "both",
+                easing: "linear",
+                timeline: new ScrollTimeline({
+                  source: document.scrollingElement || document.documentElement,
+                  axis: "block"
+                }),
+                rangeStart: Math.round(entry.docTop) + "px",
+                rangeEnd: Math.round(entry.docTop + Math.max(travel, 1)) + "px"
+              }
+            );
+            return;
+          } catch (e) {
+            entry.anim = null;
+          }
+        }
         img.style.setProperty("--px-max", entry.maxOffset.toFixed(2) + "px");
         img.style.setProperty("--px-scale", entry.scale.toFixed(4));
         img.style.setProperty("--px-start", Math.round(entry.docTop) + "px");
@@ -466,6 +510,10 @@
         // measure() needs the plain JS transform, so pause the CSS animation.
         entries.forEach(function (entry) {
           entry.img.classList.remove("px-css");
+          if (entry.anim) {
+            entry.anim.cancel();
+            entry.anim = null;
+          }
         });
       }
       measure();
