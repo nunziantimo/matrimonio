@@ -89,8 +89,12 @@ header .fadeIn,
   transition-delay: 0.45s !important;
 }
 
+/* "Creato con amore": no animation, always visible. */
 .fe-block-196a8a685450204bc529 .preFade {
-  transition-delay: 0.2s !important;
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  will-change: auto !important;
 }
 
 /* Sposa / Sposo: mirror the "Il grande giorno" cascade (h3 first, then the
