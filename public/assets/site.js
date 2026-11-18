@@ -220,14 +220,29 @@
         }
       }
 
+      // Freeze the marquee while it is offscreen: the homepage keeps two
+      // marquees running, and their per-frame SVG updates should not
+      // compete with scrolling. Progress is frozen too, so the text
+      // re-enters exactly where it left, with no visible jump.
+      var onScreen = true;
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(
+          function (entries) {
+            onScreen = entries[0].isIntersecting;
+          },
+          { rootMargin: "120px 0px" }
+        ).observe(root);
+      }
+
       function frame(now) {
         if (!last) last = now;
         var dt = Math.min((now - last) / 1000, 0.05);
         last = now;
 
-        progress -= direction * speed * 60 * dt;
-
-        render();
+        if (onScreen) {
+          progress -= direction * speed * 60 * dt;
+          render();
+        }
         root._marqueeFrame = window.requestAnimationFrame(frame);
       }
 
@@ -258,13 +273,50 @@
       }
     }
 
-    // Menu links live inside a hidden overlay: reveal them straight away.
+    // Split the targets. Header items live outside every page-section and
+    // keep the simple load fade. Everything else is grouped per section:
+    // the whole section cascades together with one trigger, exactly like
+    // the Lista nozze entrance, instead of each element firing its own
+    // observer at a slightly different scroll position.
+    var sections = [];
+    var instant = [];
+
     targets.forEach(function (element) {
-      if (element.closest(".header-menu")) reveal(element);
+      if (element.classList.contains("fadeIn")) return;
+
+      // Menu links live inside a hidden overlay: reveal them straight away.
+      if (element.closest(".header-menu")) {
+        reveal(element);
+        return;
+      }
+
+      var section = element.closest("section.page-section");
+      if (section) {
+        if (!section._trackedForReveal) {
+          section._trackedForReveal = true;
+          sections.push(section);
+        }
+      } else {
+        instant.push(element);
+      }
     });
 
+    if (instant.length) {
+      window.requestAnimationFrame(function () {
+        instant.forEach(reveal);
+      });
+    }
+
+    if (!sections.length) return;
+
+    function revealSection(section) {
+      if (section._revealed) return;
+      section._revealed = true;
+      section.classList.add("section-revealed");
+    }
+
     if (!("IntersectionObserver" in window)) {
-      targets.forEach(reveal);
+      sections.forEach(revealSection);
       return;
     }
 
@@ -272,40 +324,47 @@
       function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting) return;
-          reveal(entry.target);
+          revealSection(entry.target);
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.05, rootMargin: "0px 0px -5% 0px" }
+      // Reveal when the section's top passes 10% above the bottom edge, so
+      // the cascade is already unfolding while the content scrolls fully
+      // into view. The scroll fallback below mirrors this same margin.
+      { threshold: 0, rootMargin: "0px 0px -10% 0px" }
     );
 
-    targets.forEach(function (element) {
-      if (element.classList.contains("fadeIn")) return;
-      var rect = element.getBoundingClientRect();
+    sections.forEach(function (section) {
+      var rect = section.getBoundingClientRect();
       if (rect.bottom > 0 && rect.top < window.innerHeight) {
         window.requestAnimationFrame(function () {
-          reveal(element);
+          revealSection(section);
         });
       } else {
-        observer.observe(element);
+        observer.observe(section);
       }
     });
 
-    // Fallback: reveal anything that enters the viewport, even if the
-    // IntersectionObserver does not fire (older mobile browsers).
-    // Throttled to one check per frame and detached once everything is
+    // Fallback: reveal sections that enter the viewport even if the
+    // IntersectionObserver does not fire (older mobile browsers). It uses
+    // the observer's same 10% margin, so both paths trigger together.
+    // Throttled to one check per frame and detached once every section is
     // visible, so it never adds layout work while scrolling.
     var revealPending = false;
     function checkInView() {
       revealPending = false;
       var viewportHeight =
         window.innerHeight || document.documentElement.clientHeight;
+      var revealEdge = viewportHeight * 0.9;
       var remaining = 0;
-      targets.forEach(function (element) {
-        if (element.classList.contains("fadeIn")) return;
-        var rect = element.getBoundingClientRect();
-        if (rect.bottom > 0 && rect.top < viewportHeight) reveal(element);
-        else remaining++;
+      sections.forEach(function (section) {
+        if (section._revealed) return;
+        var rect = section.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < revealEdge) {
+          revealSection(section);
+        } else {
+          remaining++;
+        }
       });
       if (!remaining) {
         window.removeEventListener("scroll", revealInView);
@@ -323,16 +382,16 @@
     window.setTimeout(revealInView, 400);
 
     // Last-resort safety net: never leave content permanently hidden.
-    // It only force-reveals elements that are already in (or above) the
+    // It only force-reveals sections that are already in (or above) the
     // viewport: anything still below the fold stays hidden and keeps its
     // scroll-in animation instead of being silently pre-revealed after 8s.
     window.setTimeout(function () {
       var viewportHeight =
         window.innerHeight || document.documentElement.clientHeight;
-      targets.forEach(function (element) {
-        if (element.classList.contains("fadeIn")) return;
-        var rect = element.getBoundingClientRect();
-        if (rect.top < viewportHeight) reveal(element);
+      sections.forEach(function (section) {
+        if (section._revealed) return;
+        var rect = section.getBoundingClientRect();
+        if (rect.top < viewportHeight) revealSection(section);
       });
     }, 8000);
   }
